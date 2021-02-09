@@ -367,8 +367,8 @@ cmake ../nexus433 -G"Eclipse CDT4 - Unix Makefiles"
 
 # Quickstart
 
-433 MHz receiver got typically 3 pins: VIN, GND, and DATA.
-For Raspberry Pi and boards with a compatible connector like Orange Pi connect VIN to pin #1 (3.3V), GND to pin #6 (GND)
+A 433 MHz receiver has typically 3 pins: VIN, GND, and DATA.
+For Raspberry Pi and boards with a compatible connector, like Orange Pi, connect VIN to pin #1 (3.3V), GND to pin #6 (GND)
 and data to pin #11	(GPIO17).
 
 |433 MHz receiver|Raspberry Pi|Orange Pi|
@@ -494,13 +494,13 @@ sudo systemctl enable nexus433
 [Home Assistant](https://www.home-assistant.io/) is a popular open source home automation system.
 It can automatically discover and configure sensors.
 
-To make this feature working you must first enable MQTT support and enable discovery feature.
+To make this feature working, you must first enable MQTT support and enable discovery feature.
 Make sure you add the following lines to your `configuration.yaml`:
 ```yaml
 mqtt:
   discovery: true
 ```
-For more information read this article: https://www.home-assistant.io/docs/mqtt/discovery/
+For more information, read this article: https://www.home-assistant.io/docs/mqtt/discovery/
 
 You must also enable discovery support in `nexus433.ini` file, by default it is disabled. Add:
 ```ini
@@ -508,24 +508,24 @@ You must also enable discovery support in `nexus433.ini` file, by default it is 
 discovery=yes
 ```
 
-When enabled, for every new transmitter detected an extra JSON data is published on `homeassistant` topic.
+When enabled, for every new transmitter detected, an extra JSON data is published on `homeassistant` topic.
 One transmitter will create 4 new sensors: temperature, humidity, battery, and quality.
 Sample JSON data will look like this:
 ```json
 {"name": "433MHz Sensor Id:78 channel 1 Temperature", "device_class": "temperature", "state_topic": "nexus433/sensor/7800/state", "availability_topic": "nexus433/connection", "unit_of_measurement": "°C", "value_template": "{{ value_json.temperature }}", "expire_after": 90}
 ```
-You should see new sensors in Home Assistant interface. Now you must create a group or view to show them.
+You should see the new sensors in the Home Assistant interface. Now you must create a group or view to show them.
 Note that the device `name` is automatically generated. You can change the name by adding an appropriate
-section to the configuration file. Remember to change the name *before* sensor is discovered.
+section to the configuration file. Remember to change the name *before* the sensor is discovered.
 
 ## Adding sensors manually to Home Assistant
 
-When you add sensor manually, you can modify it or remove any time you like.
+When you add a sensor manually, you can modify it or remove it any time you like.
 Automatically added sensors cannot be modified or removed.
 
 To add a new sensor, you must perform exactly the same steps as adding any other MQTT sensor. See https://www.home-assistant.io/components/sensor.mqtt/ for more information.
 
-To create a new humidity sensor add the following lines to your `configuration.yaml` (it is assumed the sensor id is `5c01`):
+To create a new humidity sensor, add the following lines to your `configuration.yaml` (it is assumed the sensor id is `5c01`):
 ```yaml
 - platform: mqtt
   state_topic: "nexus433/sensor/5c01/state"
@@ -536,7 +536,7 @@ To create a new humidity sensor add the following lines to your `configuration.y
   availability_topic: "nexus433/connection"
   value_template: "{{ value_json.humidity }}"
 ```
-Alternatively you could change `availability_topic` to `nexus433/sensor/5c01/connection`
+Alternatively, you could change `availability_topic` to `nexus433/sensor/5c01/connection`
 and remove `expiry_after`.
 
 Temperature, battery and quality sensors can be added in the same way. Just remember to change
@@ -555,26 +555,26 @@ Note that there is no special device class for quality, so you can use something
 
 # Reception problems
 
-If you got problems receiving proper data from sensors you can do one the following:
+If you have problems receiving proper data from sensors, you can do one the following:
 
-1. Check if data is properly received from close range, if not check batter or test with another sensor.
+1. Check if data is properly received from close range. If that fails, check the battery level or test with another sensor.
 2. Move the antenna to a different position.
 3. Reduce `resolution_us` parameter to 0 and increase `tolerance_us`.
-4. Use longer antenna. Just attach a piece of wire. The length of the wire is related to wavelength, you can use: 69cm, 34cm, 17cm, 8cm, 4cm wires.
-5. If you got more than one sensor make sure they transmit data in different time. If two sensors collide remove the battery and insert again.
+4. Use a longer antenna. Just attach a piece of wire. The length of the wire is related to wavelength, you can use: 69cm, 34cm, 17cm, 8cm or 4cm long wires.
+5. If you have more than one sensor, make sure they transmit data at different times. If two sensors collide, remove the battery and insert it again.
 
 # CPU usage
 
-Linux is not a real time operating system. You never know how much time scheduler assigns to the application.
+Linux is not a real time operating system. You never know how much time the scheduler assigns to the application.
 
-If the system is not very busy, the application got enough time to process entire transmission more or less in real time. If the system is heavily loaded the program can easily miss transmitted bits.
+If the system is not very busy, the application has enough time to process the entire transmission more or less in real time. If the system is heavily loaded, the program can easily miss transmitted bits.
 
-For now the only solution (but unfortunately not guaranteed 100% success) is to force the system to assign more time for the application:
+For now, the only solution (but unfortunately not guaranteed to have 100% success) is to force the system to assign more time for the application:
 
-1. Increase the priority of the app; see `nice` command
+1. Increase the priority of the app; see the `nice` command.
 
-2. Change resolution to `0` (CPU usage will raise). In addition increase tolerance (but big values can also degrade significantly quality).
+2. Change resolution to `0` (CPU usage will rise). In addition, increase tolerance (but large values can also degrade the quality significantly).
 
 3. Run the application on a separate system that is either dedicated to 433MHz reception or does not run too many other apps (but that makes nexus433 quite obsolete because you can use cheaper dedicated board just for 433MHz).
 
-To definitely solve the problem, a kernel device driver is needed and entire signal processing should be made there.
+To definitely solve the problem, a kernel device driver is needed and the entire signal processing should be made there.
